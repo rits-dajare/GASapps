@@ -1,3 +1,9 @@
+---
+name: バグレポート - Bug Report
+about: バグの詳細を記載する - Provide bug details
+
+---
+
 # 概要 - Overview
 
 
