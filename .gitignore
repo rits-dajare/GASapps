@@ -1,0 +1,25 @@
+# Executables
+*.exe
+*.out
+*.app
+
+# Log file
+*.log
+  
+# Compiled class file
+*.class
+
+# dotenv
+.env
+.env.*
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Editer_Trush
+.vscode
+setting.json
+.dist
+*.swp
+
+# Custom files
