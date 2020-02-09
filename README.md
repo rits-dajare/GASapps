@@ -59,9 +59,10 @@ Please read [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for details on our code
 
 * **[xryuseix](https://github.com/xryuseix)**
 
-このプロジェクトへの[貢献者のリスト](https://github.com/your/project/contributors)もご覧ください。
+このプロジェクトへの貢献者のリストもご覧ください。
 
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+See also the list of [contributors](https://github.com/xryuseix/project/contributors) who participated in this project.
+<!-- 上の"project"にプロジェクト名を入れるの忘れずに！！！！！ -->
 
 ## Acknowledgments / 謝辞
 
