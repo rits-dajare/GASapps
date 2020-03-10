@@ -93,16 +93,23 @@ function slackPost(channel, message) {
 
 function accessJudgeApi(joke, base_url) {
   const apiUrl = "/joke/judge/?joke=";
-  const response = UrlFetchApp.fetch(base_url+ apiUrl + joke).getContentText();
+  const response = UrlFetchApp.fetch(base_url + apiUrl + joke).getContentText();
   const resJson = JSON.parse(response);
   return resJson["is_joke"];
 }
 
 function accessEvaluateApi(joke, base_url) {
   const apiUrl = "/joke/evaluate/?joke=";
-  const response = UrlFetchApp.fetch(base_url+ apiUrl + joke).getContentText();
+  const response = UrlFetchApp.fetch(base_url + apiUrl + joke).getContentText();
   const resJson = JSON.parse(response);
   return Math.round(Number(resJson["score"]) * 10) / 10;
+}
+
+function accessKatakanaApi(joke, base_url) {
+  const apiUrl = "/joke/reading/?joke=";
+  const response = UrlFetchApp.fetch(base_url + apiUrl + joke).getContentText();
+  const resJson = JSON.parse(response);
+  return resJson["reading"];
 }
 
 function iD2Name(id) {
@@ -164,67 +171,6 @@ function test(jsonObj) {
   
 }
 
-function slashCommandValidation(e) {
-  const channel = e.parameter.channel_id;
-  // ダジャレ,bottestチャンネル以外からのアクセスは弾く
-  if(channel != "CTZKSMLCA" && channel != "CU8LLRTEV") {
-    return false;
-  }
-  return true;
-}
-
-function slashCommandForce(e) {
-  // forceコマンドの処理
-  if(!slashCommandValidation(e)) {
-    return;
-  }
-
-  const present = new Date();
-  var score = -1;
-  const text = e.parameter.text;
-
-  try {
-    const base_url = JUDGE_API_BASE_URL;
-    const slicedText = text.substr(0, Math.min(30, text.length));
-    const encodedText = encodeURIComponent(slicedText);
-    // ダジャレ評価APIにアクセス
-    score = accessEvaluateApi(encodedText, base_url);
-  } catch(o_O) {
-    errLogging(o_O);
-    throw o_O;
-  }
-
-  const jsonObj = {
-    "event_time":present.getTime()/1000,
-    "event_id":e.parameter.trigger_id,
-    "event":{
-      "user":e.parameter.user_id,
-      "name":iD2Name(e.parameter.user_id),
-      "text":text,
-      "channel":e.parameter.channel_id
-    },
-    "score":score,
-    "ts":e.parameter.response_url
-  };
-
-  // スプレットシートに保存
-  slack2SheetPost(jsonObj, score, true);
-
-  // #ついったーに投稿
-  const twitterScore = Math.round(score);
-  const tweetText = makeTweetText(jsonObj, twitterScore);
-  slackPost("#ついったー", tweetText);
-  
-  // Twitter，#ダジャレに投稿
-  if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
-    postTweet(tweetText, jsonObj, twitterScore);
-    slackPost("#ダジャレ", jsonObj["event"]["name"]+':\n'+text);
-  }
-
-  var response = { text: "Force : OK" };
-  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
-}
-
 function doPost(e){
   try {
     // 通常のダジャレ
@@ -236,7 +182,11 @@ function doPost(e){
     try{
       // スラッシュコマンド
       const command = e.parameter.command;
-      return slashCommandForce(e);
+      if(command == "/force") {
+        return slashCommandForce(e);
+      } else if(command ==  "/katakana") {
+        return slashCommandKatakana(e);
+      }
     } catch(o_O) {
       errLogging(o_O);
       throw o_O;
@@ -249,4 +199,3 @@ function doPost(e){
 //}
 function doGet(e){
 }
-
