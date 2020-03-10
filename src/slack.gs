@@ -186,6 +186,8 @@ function doPost(e){
         return slashCommandForce(e);
       } else if(command ==  "/katakana") {
         return slashCommandKatakana(e);
+      } else if(command ==  "/talk") {
+        return slashCommandTalk(e);
       }
     } catch(o_O) {
       errLogging(o_O);

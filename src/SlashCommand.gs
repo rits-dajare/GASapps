@@ -49,8 +49,9 @@ function slashCommandForce(e) {
   const tweetText = makeTweetText(jsonObj, twitterScore);
   slackPost("#ついったー", tweetText);
   
-  const templateString = "ダジャレ：${joke}\n名前：${name}";
-  const message = templateString.replace("${joke}", text)
+  const templateString = "コマンド：${command}\nダジャレ：${joke}\n名前：${name}";
+  const message = templateString.replace("${command}", e.parameter.command)
+                                .replace("${joke}", text)
                                 .replace("${name}", iD2Name(e.parameter.user_id));
 
   // Twitter，#ダジャレに投稿
@@ -82,8 +83,9 @@ function slashCommandKatakana(e) {
     throw o_O;
   }
   
-  const templateString = "ダジャレ：${joke}\n読み：${reading}\n名前：${name}";
-  const message = templateString.replace("${joke}", text)
+  const templateString = "コマンド：${command}\nダジャレ：${joke}\n読み：${reading}\n名前：${name}";
+  const message = templateString.replace("${command}", e.parameter.command)
+                                .replace("${joke}", text)
                                 .replace("${reading}", reading)
                                 .replace("${name}", iD2Name(e.parameter.user_id));
 
@@ -93,5 +95,25 @@ function slashCommandKatakana(e) {
   }
 
   const response = { text: "Katakana : OK\n" };
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
+
+function slashCommandTalk(e) {
+  // talkコマンドの処理
+  if(!slashCommandValidation(e)) {
+    return;
+  }
+
+  const templateString = "コマンド：${command}\nテキスト：${text}\n名前：${name}";
+  const message = templateString.replace("${command}", e.parameter.command)
+                                .replace("${text}", e.parameter.text)
+                                .replace("${name}", iD2Name(e.parameter.user_id));
+
+  // #ダジャレに投稿
+  if(e.parameter.channel_id == "CTZKSMLCA") {
+    slackPost("#ダジャレ", message);
+  }
+
+  const response = { text: "Talk : OK\n" };
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
