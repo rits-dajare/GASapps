@@ -98,6 +98,34 @@ function slashCommandKatakana(e) {
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
+function slashCommandKatakana_hide(e) {
+  // katakanaコマンドの処理
+  if(!slashCommandValidation(e)) {
+    return;
+  }
+
+  const text = e.parameter.text;
+
+  try {
+    const base_url = JUDGE_API_BASE_URL;
+    const slicedText = text.substr(0, Math.min(30, text.length));
+    const encodedText = encodeURIComponent(slicedText);
+    // カタカナ変換APIにアクセス
+    const reading = accessKatakanaApi(encodedText, base_url);
+  } catch(o_O) {
+    errLogging(o_O);
+    throw o_O;
+  }
+  
+  const templateString = "コマンド：${command}\nダジャレ：${joke}\n読み：${reading}";
+  const message = templateString.replace("${command}", e.parameter.command)
+                                .replace("${joke}", text)
+                                .replace("${reading}", reading);
+
+  const response = { text: "Katakana_hide : OK\n" + message };
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
+
 function slashCommandTalk(e) {
   // talkコマンドの処理
   if(!slashCommandValidation(e)) {
