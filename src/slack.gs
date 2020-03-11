@@ -54,28 +54,6 @@ function slackValidation(e) {
   return jsonObj;
 }
 
-function makeTweetText(jsonObj, evaluateScore){
-  // 投稿メッセージ生成
-  const templateString = "【${time}】\nダジャレ：${joke}\n名前：${name}\n評価：${score}";
-  const date = new Date(Number(jsonObj["event_time"])*1000); // Dateオブジェクト生成
-  const dateString = Utilities.formatDate(date,"JST","yyyy/MM/dd HH:mm:ss");
-
-  var star = '';
-  for(var i = 0; i < 5; i++) {
-    if(i < evaluateScore) {
-      star += '★';
-    } else {
-      star += '☆';
-    }
-  }
-  
-  const message = templateString.replace("${time}", dateString)
-                                .replace("${joke}", jsonObj["event"]["text"])
-                                .replace("${name}", jsonObj["event"]["name"])
-                                .replace("${score}", star);
-  return message;
-}
-
 function slackPost(channel, message) {
   // Slackの特定のチャンネルに投稿
   const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');  
@@ -102,7 +80,7 @@ function accessEvaluateApi(joke, base_url) {
   const apiUrl = "/joke/evaluate/?joke=";
   const response = UrlFetchApp.fetch(base_url + apiUrl + joke).getContentText();
   const resJson = JSON.parse(response);
-  return Math.round(Number(resJson["score"]) * 10) / 10;
+  return Number(resJson["score"]);
 }
 
 function accessKatakanaApi(joke, base_url) {
@@ -120,7 +98,7 @@ function iD2Name(id) {
   return userinfo["user"]["profile"]["display_name"] || userinfo["user"]["profile"]["real_name"];
 }
 
-function test(jsonObj) {
+function dajare(jsonObj) {
 
   const base_url = JUDGE_API_BASE_URL;
   var score = -1;
@@ -164,9 +142,11 @@ function test(jsonObj) {
   const tweetText = makeTweetText(jsonObj, twitterScore);
   slackPost("#ついったー", tweetText);
   
-  // Twitterに投稿
+  // Twitterに投稿，gradeシートに記録
   if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
     postTweet(tweetText, jsonObj, twitterScore);
+    addGrade(jsonObj["event"]["user"], score);
+    updateRanking(jsonObj["event"]["user"], jsonObj["event"]["text"], score)
   }
   
 }
@@ -176,7 +156,7 @@ function doPost(e){
     // 通常のダジャレ
     var jsonObj = slackValidation(e);
     if(jsonObj != false) {
-      test(jsonObj);
+      dajare(jsonObj);
     }
   } catch(_) {
     try{

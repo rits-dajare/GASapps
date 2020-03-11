@@ -37,3 +37,24 @@ function postTweet(tweetText) {
   }
 }
 
+function makeTweetText(jsonObj, evaluateScore){
+  // 投稿メッセージ生成
+  const templateString = "【${time}】\nダジャレ：${joke}\n名前：${name}\n評価：${score}";
+  const date = new Date(Number(jsonObj["event_time"])*1000); // Dateオブジェクト生成
+  const dateString = Utilities.formatDate(date,"JST","yyyy/MM/dd HH:mm:ss");
+
+  var star = '';
+  for(var i = 0; i < 5; i++) {
+    if(i < evaluateScore) {
+      star += '★';
+    } else {
+      star += '☆';
+    }
+  }
+  
+  const message = templateString.replace("${time}", dateString)
+                                .replace("${joke}", jsonObj["event"]["text"])
+                                .replace("${name}", jsonObj["event"]["name"])
+                                .replace("${score}", star);
+  return message;
+}
