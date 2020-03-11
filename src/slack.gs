@@ -184,10 +184,12 @@ function doPost(e){
       const command = e.parameter.command;
       if(command == "/force") {
         return slashCommandForce(e);
-      } else if(command ==  "/katakana") {
+      } else if(command == "/katakana") {
         return slashCommandKatakana(e);
-      } else if(command ==  "/talk") {
+      } else if(command == "/talk") {
         return slashCommandTalk(e);
+      } else if(command == "/list") {
+        return slashCommandList(e);
       }
     } catch(o_O) {
       errLogging(o_O);

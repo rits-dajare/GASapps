@@ -117,3 +117,13 @@ function slashCommandTalk(e) {
   const response = { text: "Talk : OK\n" };
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
+
+function slashCommandList(e) {
+  // talkコマンドの処理
+  if(!slashCommandValidation(e)) {
+    return;
+  }
+
+  const response = { text: "https://github.com/rits-dajare/GASapps/wiki/Slack-Slash-Commands" };
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
