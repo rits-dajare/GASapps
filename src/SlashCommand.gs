@@ -155,3 +155,42 @@ function slashCommandList(e) {
   const response = { text: "https://github.com/rits-dajare/GASapps/wiki/Slack-Slash-Commands" };
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
+
+function slashCommandInfo(e) {
+  // talkコマンドの処理
+  if(!slashCommandValidation(e)) {
+    return;
+  }
+  
+  const text = e.parameter.text;
+  
+  try {
+    const base_url = JUDGE_API_BASE_URL;
+    const slicedText = text.substr(0, Math.min(30, text.length));
+    const encodedText = encodeURIComponent(slicedText);
+    // カタカナ変換APIにアクセス
+    const katakana = accessKatakanaApi(encodedText, base_url);
+    // ダジャレ判定APIにアクセス
+    const judgeJson = accessJudgeApi(encodedText, base_url);
+    const isJoke = judgeJson["is_joke"];
+    const includeSensitive = judgeJson["include_sensitive"];
+    // ダジャレ評価APIにアクセス
+    const evaluate = accessEvaluateApi(encodedText, base_url);
+  } catch(o_O) {
+    errLogging(o_O);
+    throw o_O;
+  }
+  
+  const templateString = "ダジャレ：${joke}\n片仮名：${katakana}\nis_joke：${is_joke}\nevaluate：${evaluate}\ninclude_sensitive：${include_sensitive}\n";
+  const message = templateString.replace("${joke}", text)
+                                .replace("${katakana}", katakana)
+                                .replace("${is_joke}", isJoke)
+                                .replace("${evaluate}", evaluate)
+                                .replace("${include_sensitive}", includeSensitive);
+
+
+  const response = { text: message };
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
+
+

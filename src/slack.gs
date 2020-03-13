@@ -73,7 +73,7 @@ function accessJudgeApi(joke, base_url) {
   const apiUrl = "/joke/judge/?joke=";
   const response = UrlFetchApp.fetch(base_url + apiUrl + joke).getContentText();
   const resJson = JSON.parse(response);
-  return resJson["is_joke"];
+  return resJson;
 }
 
 function accessEvaluateApi(joke, base_url) {
@@ -107,7 +107,10 @@ function dajare(jsonObj) {
     const encodedText = encodeURIComponent(slicedText);
 
     // ダジャレ判定APIにアクセス
-    const isjoke = accessJudgeApi(encodedText, base_url);
+    const judgeJson = accessJudgeApi(encodedText, base_url);
+    const isjoke = judgeJson["is_joke"];
+    const includeSensitive = judgeJson["include_sensitive"];
+
     if(!isjoke) {
       return;
     }
@@ -121,7 +124,7 @@ function dajare(jsonObj) {
   
   // ユーザーの表示名を追加
   jsonObj["event"]["name"] = iD2Name(jsonObj["event"]["user"]);
-  
+
   // スプレットシートに保存
   slack2SheetPost(jsonObj, score);
   
@@ -136,18 +139,29 @@ function dajare(jsonObj) {
       return;
     }
   }
-
-  // #ついったーに投稿
+  
   const twitterScore = Math.round(score);
   const tweetText = makeTweetText(jsonObj, twitterScore);
-  slackPost("#ついったー", tweetText);
-  
-  // Twitterに投稿，gradeシートに記録
+
   if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
-    postTweet(tweetText, jsonObj, twitterScore);
-    addGrade(jsonObj["event"]["user"], score);
-    updateRanking(jsonObj["event"]["user"], jsonObj["event"]["text"], score)
+    // ダジャレチャンネル
+    if(includeSensitive) {
+      slackPost("#ダジャレ", "センシティブな情報が含まれているためツイートされませんでした");
+    } else {
+      // Twitterに投稿，gradeシートに記録
+      postTweet(tweetText, jsonObj, twitterScore);
+      addGrade(jsonObj["event"]["user"], score);
+      updateRanking(jsonObj["event"]["user"], jsonObj["event"]["text"], score)
+    }
+  } else if(jsonObj["event"]["channel"] == "CU8LLRTEV"){
+    // bot_testチャンネル
+    if(includeSensitive) {
+      slackPost("#bot_test", "センシティブな情報が含まれているためツイートされませんでした");
+    }
   }
+
+  // #ついったーに投稿
+  slackPost("#ついったー", tweetText);
   
 }
 
@@ -172,6 +186,8 @@ function doPost(e){
         return slashCommandTalk(e);
       } else if(command == "/list") {
         return slashCommandList(e);
+      } else if(command == "/info") {
+        return slashCommandInfo(e);
       }
     } catch(o_O) {
       errLogging(o_O);
