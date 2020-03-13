@@ -219,6 +219,10 @@ function slashCommandGrade(e, isTweet) {
       break;
     }
   }
+  if(userRow == -1) {
+    slackPost("#ダジャレ", iD2Name(userId) + "さんはデータがありません");
+    return ContentService.createTextOutput();
+  }
   const templateString = "${name}さんのダジャレ成績\n週間ダジャレ数：${weekly}\n週間GPA：${wGPA}\n月間ダジャレ数：${monthly}\n月間GPA：${mGPA}\n半期間ダジャレ数：${halfPeriod}\n半期間GPA：${hGPA}";
   const message = templateString.replace("${name}", iD2Name(userId))
                                 .replace("${weekly}", gradeData[userRow][1])
