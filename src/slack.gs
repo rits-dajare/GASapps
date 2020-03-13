@@ -190,6 +190,8 @@ function doPost(e){
         return slashCommandInfo(e);
       } else if (command == "/grade") {
         return slashCommandGrade(e);
+      } else if (command == "/grade_with_tweet") {
+        return slashCommandGradeWithTweet(e);
       }
     } catch(o_O) {
       errLogging(o_O);

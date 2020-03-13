@@ -245,8 +245,9 @@ function slashCommandGrade(e, isTweet) {
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
-
-
+function slashCommandGradeWithTweet(e) {
+  return slashCommandGrade(e, true);
+}
 
 
 
