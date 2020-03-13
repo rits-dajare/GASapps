@@ -56,11 +56,12 @@ function slashCommandForce(e) {
 
   // Twitter，#ダジャレに投稿
   if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
-    postTweet(tweetText, jsonObj, twitterScore);
+    postTweet(tweetText);
     slackPost("#ダジャレ", message);
+    return ContentService.createTextOutput();
   }
 
-  const response = { text: "Force : OK" };
+  const response = { text: "Force : OK" + tweetText};
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -92,9 +93,10 @@ function slashCommandKatakana(e) {
   // #ダジャレに投稿
   if(e.parameter.channel_id == "CTZKSMLCA") {
     slackPost("#ダジャレ", message);
+    return ContentService.createTextOutput();
   }
 
-  const response = { text: "Katakana : OK\n" };
+  const response = { text: "Katakana : OK" + message};
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -122,7 +124,7 @@ function slashCommandKatakana_hide(e) {
                                 .replace("${joke}", text)
                                 .replace("${reading}", reading);
 
-  const response = { text: "Katakana_hide : OK\n" + message };
+  const response = { text: "Katakana_hide : OK" + message};
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -136,13 +138,14 @@ function slashCommandTalk(e) {
   const message = templateString.replace("${command}", e.parameter.command)
                                 .replace("${text}", e.parameter.text)
                                 .replace("${name}", iD2Name(e.parameter.user_id));
-
+  
   // #ダジャレに投稿
   if(e.parameter.channel_id == "CTZKSMLCA") {
     slackPost("#ダジャレ", message);
+    return ContentService.createTextOutput();
   }
 
-  const response = { text: "Talk : OK\n" };
+  const response = { text: "Talk : OK\n" + message};
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
 
@@ -157,7 +160,7 @@ function slashCommandList(e) {
 }
 
 function slashCommandInfo(e) {
-  // talkコマンドの処理
+  // infoコマンドの処理
   if(!slashCommandValidation(e)) {
     return;
   }
@@ -192,5 +195,60 @@ function slashCommandInfo(e) {
   const response = { text: message };
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
 }
+
+function slashCommandGrade(e, isTweet) {
+  // userコマンドの処理
+  if(!slashCommandValidation(e)) {
+    return;
+  }
+
+  const userId = e.parameter.user_id;
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('grade');
+  const lastRow = sheet.getLastRow() + 1;
+  var response;
+  if(lastRow == 1) {
+    response = { text: "データがありません" };
+    return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+  }
+
+  const gradeData = sheet.getRange("A2:G" + lastRow).getValues();
+  var userRow = -1;
+  for(var i = 0; i < lastRow - 2; i++) {
+    if(gradeData[i][0] == userId) {
+      userRow = i;
+      break;
+    }
+  }
+  const templateString = "${name}さんのダジャレ成績\n週間ダジャレ数：${weekly}\n週間GPA：${wGPA}\n月間ダジャレ数：${monthly}\n月間GPA：${mGPA}\n半期間ダジャレ数：${halfPeriod}\n半期間GPA：${hGPA}";
+  const message = templateString.replace("${name}", iD2Name(userId))
+                                .replace("${weekly}", gradeData[userRow][1])
+                                .replace("${wGPA}", Math.round(gradeData[userRow][2]/gradeData[userRow][1] * 10) / 10)
+                                .replace("${monthly}", gradeData[userRow][3])
+                                .replace("${mGPA}", Math.round(gradeData[userRow][4]/gradeData[userRow][3] * 10) / 10)
+                                .replace("${halfPeriod}", gradeData[userRow][5])
+                                .replace("${hGPA}", Math.round(gradeData[userRow][6]/gradeData[userRow][5] * 10) / 10);
+
+  // #ダジャレに投稿
+  if(e.parameter.channel_id == "CTZKSMLCA") {
+    slackPost("#ダジャレ", message);
+    if(isTweet){
+      postTweet(message);
+    }
+    return ContentService.createTextOutput();
+  }
+
+  response = { text: "Grade : OK\n" + message };
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
+
+
+
+
+
+
+
+
+
+
 
 

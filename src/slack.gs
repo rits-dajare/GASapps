@@ -178,16 +178,18 @@ function doPost(e){
       const command = e.parameter.command;
       if(command == "/force") {
         return slashCommandForce(e);
-      } else if(command == "/katakana") {
+      } else if (command == "/katakana") {
         return slashCommandKatakana(e);
-      } else if(command == "/katakana_hide") {
+      } else if (command == "/katakana_hide") {
         return slashCommandKatakana_hide(e);
-      } else if(command == "/talk") {
+      } else if (command == "/talk") {
         return slashCommandTalk(e);
-      } else if(command == "/list") {
+      } else if (command == "/list") {
         return slashCommandList(e);
-      } else if(command == "/info") {
+      } else if (command == "/info") {
         return slashCommandInfo(e);
+      } else if (command == "/grade") {
+        return slashCommandGrade(e);
       }
     } catch(o_O) {
       errLogging(o_O);
