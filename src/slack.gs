@@ -1,6 +1,6 @@
 var JUDGE_API_BASE_URL = "http://abelab.dev:8080";
 
-function slack2SheetPost(jsonObj, score, isSlash) {
+function slack2SheetPost(jsonObj, score, isSlash, includeSensitive, mode) {
   // スプレットシートに記述する
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('index');
   const newRow = sheet.getLastRow() + 1;
@@ -11,13 +11,13 @@ function slack2SheetPost(jsonObj, score, isSlash) {
   sheet.getRange(newRow, 4).setValue(jsonObj["event"]["name"]); // 表示名
   sheet.getRange(newRow, 5).setValue(jsonObj["event"]["text"]); // 本文
   sheet.getRange(newRow, 6).setValue(score); // score
-  sheet.getRange(newRow, 7).setValue(-1); // likes
+  sheet.getRange(newRow, 7).setValue(includeSensitive); // センシティブな単語が含まれているか
   sheet.getRange(newRow, 8).setValue("Slack"); // slack or twitter
   if(!isSlash) {
     const link = "https://dajarerits.slack.com/archives/" + jsonObj["event"]["channel"] + "/p";
     sheet.getRange(newRow, 9).setValue(link + jsonObj["event"]["ts"].replace('.','')); // link
   }
-  sheet.getRange(newRow, 10).setValue(""); // 備考
+  sheet.getRange(newRow, 10).setValue(mode); // 備考
 }
 
 function regularExpressionJudge(jsonObj, word) {
@@ -110,7 +110,6 @@ function dajare(jsonObj) {
     const judgeJson = accessJudgeApi(encodedText, base_url);
     const isjoke = judgeJson["is_joke"];
     const includeSensitive = judgeJson["include_sensitive"];
-
     if(!isjoke) {
       return;
     }
@@ -126,7 +125,8 @@ function dajare(jsonObj) {
   jsonObj["event"]["name"] = iD2Name(jsonObj["event"]["user"]);
 
   // スプレットシートに保存
-  slack2SheetPost(jsonObj, score);
+  slack2SheetPost(jsonObj, score, false, includeSensitive, "#ダジャレ");
+
   
   // イベントが二個出たとき，二個目は破棄して一行消す
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('index');

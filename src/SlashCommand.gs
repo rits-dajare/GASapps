@@ -42,7 +42,7 @@ function slashCommandForce(e) {
   };
 
   // スプレットシートに保存
-  slack2SheetPost(jsonObj, score, true);
+  slack2SheetPost(jsonObj, score, true, "None", "force");
 
   // #ついったーに投稿
   const twitterScore = Math.round(score);
