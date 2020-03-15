@@ -142,6 +142,7 @@ function dajare(jsonObj) {
   
   const twitterScore = Math.round(score);
   const tweetText = makeTweetText(jsonObj, twitterScore);
+  var TwitterURL = "";
 
   if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
     // ダジャレチャンネル
@@ -149,7 +150,8 @@ function dajare(jsonObj) {
       slackPost("#ダジャレ", "センシティブな情報が含まれているためツイートされませんでした");
     } else {
       // Twitterに投稿，gradeシートに記録
-      postTweet(tweetText, jsonObj, twitterScore);
+      const response = postTweet(tweetText, jsonObj, twitterScore);
+      TwitterURL = "\nhttps://twitter.com/rits_dajare/status/" + response["id_str"];
       addGrade(jsonObj["event"]["user"], score);
       updateRanking(jsonObj["event"]["user"], jsonObj["event"]["text"], score)
     }
@@ -161,7 +163,7 @@ function dajare(jsonObj) {
   }
 
   // #ついったーに投稿
-  slackPost("#ついったー", tweetText);
+  slackPost("#ついったー", tweetText + TwitterURL);
   
 }
 
@@ -198,10 +200,4 @@ function doPost(e){
       throw o_O;
     }
   }
-}
-
-//const debug = () => {
-//  console.log(accessJudgeApi("布団がふっとん", JUDGE_API_BASE_URL))
-//}
-function doGet(e){
 }
