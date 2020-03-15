@@ -22,8 +22,8 @@ function reset() {
 // ツイートを投稿
 function postTweet(tweetText) {
   try{
-    var service  = twitter.getService();
-    var endPointUrl = 'https://api.twitter.com/1.1/statuses/update.json';
+    const service  = twitter.getService();
+    const endPointUrl = 'https://api.twitter.com/1.1/statuses/update.json';
     
     var response = service.fetch(endPointUrl, {
       method: 'post',
@@ -31,8 +31,9 @@ function postTweet(tweetText) {
         status: tweetText
       }
     });
-  } catch(e) {  
-    Logger.log("Twitter投稿失敗"+ e );
+    return JSON.parse(response);
+  } catch(e) {
+    errLogging("Twitter投稿失敗"+ e );
     return -1;
   }
 }
@@ -51,7 +52,7 @@ function makeTweetText(jsonObj, evaluateScore){
       star += '☆';
     }
   }
-  
+
   const message = templateString.replace("${time}", dateString)
                                 .replace("${joke}", jsonObj["event"]["text"])
                                 .replace("${name}", jsonObj["event"]["name"])
