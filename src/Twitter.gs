@@ -38,12 +38,26 @@ function postTweet(tweetText) {
   }
 }
 
+// ツイート文テンプレートを取得
+function fetchTemplateString(userId) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('personalData');
+  const users = sheet.getRange("A2:E" + sheet.getLastRow()).getValues();
+  for(var i = 0; i < users.length; i++) {
+    if(users[i][0] == userId) {
+      return users[i][4].replace('\n', '\n\r');
+    }
+  }
+  const defaultString = "【${time}】\nダジャレ：${joke}\n名前：${name}\n評価：${score}";
+  return defaultString;
+}
+
+// 投稿メッセージ生成
 function makeTweetText(jsonObj, evaluateScore){
-  // 投稿メッセージ生成
-  const templateString = "【${time}】\nダジャレ：${joke}\n名前：${name}\n評価：${score}";
   const date = new Date(Number(jsonObj["event_time"])*1000); // Dateオブジェクト生成
   const dateString = Utilities.formatDate(date,"JST","yyyy/MM/dd HH:mm:ss");
-
+  
+  var templateString = fetchTemplateString(jsonObj["event"]["user"]);
+  
   var star = '';
   for(var i = 0; i < 5; i++) {
     if(i < evaluateScore) {

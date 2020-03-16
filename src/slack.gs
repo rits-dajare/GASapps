@@ -194,6 +194,8 @@ function doPost(e){
         return slashCommandGrade(e);
       } else if (command == "/grade_with_tweet") {
         return slashCommandGradeWithTweet(e);
+      } else if (command == "/user") {
+        return slashCommandUser(e);
       }
     } catch(o_O) {
       errLogging(o_O);

@@ -249,7 +249,10 @@ function slashCommandGradeWithTweet(e) {
   return slashCommandGrade(e, true);
 }
 
-
+function slashCommandUser(e) {
+  const response = { text: "SlackId : "+ e.parameter.user_id + "\n" };
+  return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
+}
 
 
 
