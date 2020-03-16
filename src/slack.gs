@@ -24,6 +24,11 @@ function regularExpressionJudge(jsonObj, word) {
   return jsonObj["event"]["text"].match(word);
 }
 
+function removeSymbols(str) {
+  const replaced = str.replace(/[！＠＃＄％＾＆＊（）＿＋＝【】『』，．・；’「」｀＼,\.~!@#\$%\^&\*\(\)_\+\-=\{\}\[\]:;"'<>?\\\/\|]/g, '');
+  return replaced;
+}
+
 function slackValidation(e) {
   const jsonObj = JSON.parse(e.postData.getDataAsString());
 
@@ -104,7 +109,12 @@ function dajare(jsonObj) {
   var score = -1;
   try {
     const slicedText = jsonObj["event"]["text"].substr(0, Math.min(30, jsonObj["event"]["text"].length));
-    const encodedText = encodeURIComponent(slicedText);
+    const removeSymbolText = removeSymbols(slicedText);
+    if(removeSymbolText == "") {
+      // 空文字or記号のみの時
+      return;
+    }
+    const encodedText = encodeURIComponent(removeSymbolText);
 
     // ダジャレ判定APIにアクセス
     const judgeJson = accessJudgeApi(encodedText, base_url);
