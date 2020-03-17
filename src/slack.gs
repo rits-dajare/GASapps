@@ -29,6 +29,10 @@ function removeSymbols(str) {
   return replaced;
 }
 
+function readingReplace(str, mode) {
+  return str.replace(/\{([^{|}]+)\|([^{|}]+)\}/g, "$" + mode);
+}
+
 function slackValidation(e) {
   const jsonObj = JSON.parse(e.postData.getDataAsString());
 
@@ -109,7 +113,8 @@ function dajare(jsonObj) {
   var score = -1;
   try {
     const slicedText = jsonObj["event"]["text"].substr(0, Math.min(30, jsonObj["event"]["text"].length));
-    const removeSymbolText = removeSymbols(slicedText);
+    const readingReplacedText = readingReplace(slicedText, 2);
+    const removeSymbolText = removeSymbols(readingReplacedText);
     if(removeSymbolText == "") {
       // 空文字or記号のみの時
       return;
@@ -130,6 +135,9 @@ function dajare(jsonObj) {
     errLogging(o_O);
     throw o_O;
   }
+  
+  // 読み方を指定してあった場合，その読み方の表記を削除({Script|スクリプト}->Script)
+  jsonObj["event"]["text"] = readingReplace(jsonObj["event"]["text"], 1);
   
   // ユーザーの表示名を追加
   jsonObj["event"]["name"] = iD2Name(jsonObj["event"]["user"]);
