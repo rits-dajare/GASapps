@@ -44,7 +44,7 @@ function fetchTemplateString(userId) {
   const users = sheet.getRange("A2:E" + sheet.getLastRow()).getValues();
   for(var i = 0; i < users.length; i++) {
     if(users[i][0] == userId) {
-      return users[i][4].replace('\n', '\n\r');
+      return users[i][4];
     }
   }
   const defaultString = "【${time}】\nダジャレ：${joke}\n名前：${name}\n評価：${score}";

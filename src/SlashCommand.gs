@@ -191,7 +191,6 @@ function slashCommandInfo(e) {
   }
   
   const text = e.parameter.text;
-  
   try {
     const base_url = JUDGE_API_BASE_URL;
     const slicedText = text.substr(0, Math.min(30, text.length));
@@ -203,25 +202,25 @@ function slashCommandInfo(e) {
     }
     const encodedText = encodeURIComponent(removeSymbolText);
 
-    // カタカナ変換APIにアクセス
-    const katakana = accessKatakanaApi(encodedText, base_url);
-    // ダジャレ判定APIにアクセス
-    const judgeJson = accessJudgeApi(encodedText, base_url);
-    const isJoke = judgeJson["is_joke"];
-    const includeSensitive = judgeJson["include_sensitive"];
-    // ダジャレ評価APIにアクセス
-    const evaluate = accessEvaluateApi(encodedText, base_url);
+    // ダジャレ判定評価APIにアクセス
+    const apiResponse = accessAllApi(encodedText, base_url);
+    const isJoke = apiResponse[0]["is_joke"];
+    const includeSensitive = apiResponse[0]["include_sensitive"];
+    const sensitiveTags = apiResponse[0]["sensitive_tags"];
+    const score = apiResponse[1]["score"];
+    const katakana = apiResponse[2]["reading"];
   } catch(o_O) {
     errLogging(o_O);
     throw o_O;
   }
   
-  const templateString = "ダジャレ：${joke}\n片仮名：${katakana}\nis_joke：${is_joke}\nevaluate：${evaluate}\ninclude_sensitive：${include_sensitive}\n";
+  const templateString = "ダジャレ：${joke}\n片仮名：${katakana}\nis_joke：${is_joke}\nevaluate：${evaluate}\ninclude_sensitive：${include_sensitive}\nsensitive_tags：${sensitive_tags}\n";
   const message = templateString.replace("${joke}", readingReplace(text, 1))
                                 .replace("${katakana}", katakana)
                                 .replace("${is_joke}", isJoke)
-                                .replace("${evaluate}", evaluate)
-                                .replace("${include_sensitive}", includeSensitive);
+                                .replace("${evaluate}", score)
+                                .replace("${include_sensitive}", includeSensitive)
+                                .replace("${sensitive_tags}",sensitiveTags.join(', '));
 
 
   const response = { text: message };

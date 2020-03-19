@@ -5,19 +5,25 @@ function slack2SheetPost(jsonObj, score, isSlash, includeSensitive, mode) {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('index');
   const newRow = sheet.getLastRow() + 1;
 
-  sheet.getRange(newRow, 1).setValue(jsonObj["event_time"]); // タイムスタンプ
-  sheet.getRange(newRow, 2).setValue(jsonObj["event_id"]); // イベントID
-  sheet.getRange(newRow, 3).setValue(jsonObj["event"]["user"]); // ユーザーID
-  sheet.getRange(newRow, 4).setValue(jsonObj["event"]["name"]); // 表示名
-  sheet.getRange(newRow, 5).setValue(jsonObj["event"]["text"]); // 本文
-  sheet.getRange(newRow, 6).setValue(score); // score
-  sheet.getRange(newRow, 7).setValue(includeSensitive); // センシティブな単語が含まれているか
-  sheet.getRange(newRow, 8).setValue("Slack"); // slack or twitter
+  var link="";
   if(!isSlash) {
-    const link = "https://dajarerits.slack.com/archives/" + jsonObj["event"]["channel"] + "/p";
-    sheet.getRange(newRow, 9).setValue(link + jsonObj["event"]["ts"].replace('.','')); // link
+    link = "https://dajarerits.slack.com/archives/" + jsonObj["event"]["channel"] + "/p"+ jsonObj["event"]["ts"].replace('.','');
   }
-  sheet.getRange(newRow, 10).setValue(mode); // 備考
+
+  const newData = [[
+    jsonObj["event_time"], // タイムスタンプ
+    jsonObj["event_id"], // イベントID
+    jsonObj["event"]["user"], // ユーザーID
+    jsonObj["event"]["name"], // 表示名
+    jsonObj["event"]["text"], // 本文
+    score, // score
+    includeSensitive, // センシティブな単語が含まれているか
+    "Slack", // slack or twitter
+    link, // link
+    mode // mode
+  ]];
+  
+  sheet.getRange('A'+newRow+':J'+newRow).setValues(newData);
 }
 
 function regularExpressionJudge(jsonObj, word) {
@@ -99,18 +105,29 @@ function accessKatakanaApi(joke, base_url) {
   return resJson["reading"];
 }
 
+function accessAllApi(joke, base_url) {
+  const judgeUrl = base_url + '/joke/judge/?joke=' + joke;
+  const evaluateUrl = base_url + '/joke/evaluate/?joke=' + joke;
+  const katakanaUrl = base_url + '/joke/reading/?joke=' + joke;
+  
+  const response = UrlFetchApp.fetchAll([judgeUrl, evaluateUrl, katakanaUrl]);
+  const judgeJson = JSON.parse(response[0].getContentText());
+  const evaluateJson = JSON.parse(response[1].getContentText());
+  const katakanaJson = JSON.parse(response[2].getContentText());
+  return [judgeJson, evaluateJson, katakanaJson];
+}
+
 function iD2Name(id) {
   const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');  
   const slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
   const userinfo = slackApp.usersInfo(id);
-
   return userinfo["user"]["profile"]["display_name"] || userinfo["user"]["profile"]["real_name"];
 }
 
 function dajare(jsonObj) {
-
   const base_url = JUDGE_API_BASE_URL;
   var score = -1;
+  var sensitiveTags = [];
   try {
     const slicedText = jsonObj["event"]["text"].substr(0, Math.min(30, jsonObj["event"]["text"].length));
     const readingReplacedText = readingReplace(slicedText, 2);
@@ -125,38 +142,40 @@ function dajare(jsonObj) {
     const judgeJson = accessJudgeApi(encodedText, base_url);
     const isjoke = judgeJson["is_joke"];
     const includeSensitive = judgeJson["include_sensitive"];
+    sensitiveTags = judgeJson["sensitive_tags"];
     if(!isjoke) {
       return;
     }
 
     // ダジャレ評価APIにアクセス
     score = accessEvaluateApi(encodedText, base_url);
+    if(!isjoke) {
+      return;
+    }
   } catch(o_O) {
     errLogging(o_O);
     throw o_O;
   }
-  
+
   // 読み方を指定してあった場合，その読み方の表記を削除({Script|スクリプト}->Script)
   jsonObj["event"]["text"] = readingReplace(jsonObj["event"]["text"], 1);
-  
+
   // ユーザーの表示名を追加
   jsonObj["event"]["name"] = iD2Name(jsonObj["event"]["user"]);
 
-  // スプレットシートに保存
-  slack2SheetPost(jsonObj, score, false, includeSensitive, "#ダジャレ");
-
-  
   // イベントが二個出たとき，二個目は破棄して一行消す
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('index');
   const lastRow = sheet.getLastRow();
   const lastEventTime = sheet.getRange(lastRow, 1).getValue();
+  const nextEventTime = jsonObj["event_time"];
   if(lastRow > 1) {
-    const beforeLastEventTime = sheet.getRange(lastRow - 1, 1).getValue();
-    if(parseInt(lastEventTime) <= parseInt(beforeLastEventTime)) {
-      sheet.deleteRows(lastRow, 1);
+    if(parseInt(lastEventTime) >= nextEventTime) {
       return;
     }
   }
+
+  // スプレットシートに保存
+  slack2SheetPost(jsonObj, score, false, includeSensitive, "#ダジャレ");
   
   const twitterScore = Math.round(score);
   const tweetText = makeTweetText(jsonObj, twitterScore);
@@ -165,7 +184,7 @@ function dajare(jsonObj) {
   if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
     // ダジャレチャンネル
     if(includeSensitive) {
-      slackPost("#ダジャレ", "センシティブな情報が含まれているためツイートされませんでした");
+      slackPost("#ダジャレ", "センシティブな情報が含まれているためツイートされませんでした\n項目：" + sensitiveTags.join(', '));
     } else {
       // Twitterに投稿，gradeシートに記録
       const response = postTweet(tweetText, jsonObj, twitterScore);
@@ -176,7 +195,7 @@ function dajare(jsonObj) {
   } else if(jsonObj["event"]["channel"] == "CU8LLRTEV"){
     // bot_testチャンネル
     if(includeSensitive) {
-      slackPost("#bot_test", "センシティブな情報が含まれているためツイートされませんでした");
+      slackPost("#bot_test", "センシティブな情報が含まれているためツイートされませんでした\n項目：" + sensitiveTags.join(', '));
     }
   }
 
