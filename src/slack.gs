@@ -84,6 +84,24 @@ function slackPost(channel, message) {
   slackApp.postMessage(options.channelId, options.message, {username: options.userName});
 }
 
+function addReaction(channel, ts, emoji){
+  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN'); 
+  var payload = {
+    "token" : token,
+    "channel" : channel,
+    "timestamp" : ts,
+    "name" : emoji
+  };
+  
+  var options = {
+    "method" : "post",
+    "payload" : payload
+  };
+
+  UrlFetchApp.fetch("https://slack.com/api/reactions.add", options);
+}
+
+
 function accessJudgeApi(joke, base_url) {
   const apiUrl = "/joke/judge/?joke=";
   const response = UrlFetchApp.fetch(base_url + apiUrl + joke).getContentText();
@@ -144,14 +162,12 @@ function dajare(jsonObj) {
     const includeSensitive = judgeJson["include_sensitive"];
     sensitiveTags = judgeJson["sensitive_tags"];
     if(!isjoke) {
+      addReaction(jsonObj["event"]["channel"], jsonObj["event"]["ts"], "thumbsdown");
       return;
     }
 
     // ダジャレ評価APIにアクセス
     score = accessEvaluateApi(encodedText, base_url);
-    if(!isjoke) {
-      return;
-    }
   } catch(o_O) {
     errLogging(o_O);
     throw o_O;
@@ -184,18 +200,24 @@ function dajare(jsonObj) {
   if(jsonObj["event"]["channel"] == "CTZKSMLCA") {
     // ダジャレチャンネル
     if(includeSensitive) {
+      addReaction(jsonObj["event"]["channel"], jsonObj["event"]["ts"], "thumbsdown");
       slackPost("#ダジャレ", "センシティブな情報が含まれているためツイートされませんでした\n項目：" + sensitiveTags.join(', '));
     } else {
       // Twitterに投稿，gradeシートに記録
       const response = postTweet(tweetText, jsonObj, twitterScore);
       TwitterURL = "\nhttps://twitter.com/rits_dajare/status/" + response["id_str"];
+      
       addGrade(jsonObj["event"]["user"], score);
-      updateRanking(jsonObj["event"]["user"], jsonObj["event"]["text"], score)
+      updateRanking(jsonObj["event"]["user"], jsonObj["event"]["text"], score);
+      addReaction(jsonObj["event"]["channel"], jsonObj["event"]["ts"], "thumbsup");
     }
   } else if(jsonObj["event"]["channel"] == "CU8LLRTEV"){
     // bot_testチャンネル
     if(includeSensitive) {
+      addReaction(jsonObj["event"]["channel"], jsonObj["event"]["ts"], "thumbsdown");
       slackPost("#bot_test", "センシティブな情報が含まれているためツイートされませんでした\n項目：" + sensitiveTags.join(', '));
+    } else {
+      addReaction(jsonObj["event"]["channel"], jsonObj["event"]["ts"], "thumbsup");
     }
   }
 
