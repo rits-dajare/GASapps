@@ -22,13 +22,12 @@ function slashCommandForce(e) {
     const base_url = JUDGE_API_BASE_URL;
     const slicedText = text.substr(0, Math.min(30, text.length));
     const readingReplacedText = readingReplace(slicedText, 2);
-    const removeSymbolText = removeSymbols(readingReplacedText);
-    if(removeSymbolText == "") {
+    if(readingReplacedText == "") {
       // 空文字or記号のみの時
       response = { text: "Force : NG\n文字を入力してください"};
       return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(ContentService.MimeType.JSON);
     }
-    const encodedText = encodeURIComponent(removeSymbolText);
+    const encodedText = encodeURIComponent(readingReplacedText);
     
     // ダジャレ評価APIにアクセス
     score = accessEvaluateApi(encodedText, base_url);
@@ -86,12 +85,11 @@ function slashCommandKatakana(e) {
     const base_url = JUDGE_API_BASE_URL;
     const slicedText = text.substr(0, Math.min(30, text.length));
     const readingReplacedText = readingReplace(slicedText, 2);
-    const removeSymbolText = removeSymbols(readingReplacedText);
-    if(removeSymbolText == "") {
+    if(readingReplacedText == "") {
       // 空文字or記号のみの時
       return ContentService.createTextOutput(JSON.stringify({ text: "Katakana : NG\n文字を入力してください"})).setMimeType(ContentService.MimeType.JSON);
     }
-    const encodedText = encodeURIComponent(removeSymbolText);
+    const encodedText = encodeURIComponent(readingReplacedText);
  
     // カタカナ変換APIにアクセス
     const reading = accessKatakanaApi(encodedText, base_url);
@@ -129,12 +127,11 @@ function slashCommandKatakana_hide(e) {
     const base_url = JUDGE_API_BASE_URL;
     const slicedText = text.substr(0, Math.min(30, text.length));
     const readingReplacedText = readingReplace(slicedText, 2);
-    const removeSymbolText = removeSymbols(readingReplacedText);
-    if(removeSymbolText == "") {
+    if(readingReplacedText == "") {
       // 空文字or記号のみの時
       return ContentService.createTextOutput(JSON.stringify({ text: "Katakana_hide : NG\n文字を入力してください"})).setMimeType(ContentService.MimeType.JSON);
     }
-    const encodedText = encodeURIComponent(removeSymbolText);
+    const encodedText = encodeURIComponent(readingReplacedText);
     
     // カタカナ変換APIにアクセス
     const reading = accessKatakanaApi(encodedText, base_url);
@@ -195,12 +192,11 @@ function slashCommandInfo(e) {
     const base_url = JUDGE_API_BASE_URL;
     const slicedText = text.substr(0, Math.min(30, text.length));
     const readingReplacedText = readingReplace(slicedText, 2);
-    const removeSymbolText = removeSymbols(readingReplacedText);
-    if(removeSymbolText == "") {
+    if(readingReplacedText == "") {
       // 空文字or記号のみの時
       return ContentService.createTextOutput(JSON.stringify({ text: "Info : NG\n文字を入力してください"})).setMimeType(ContentService.MimeType.JSON);
     }
-    const encodedText = encodeURIComponent(removeSymbolText);
+    const encodedText = encodeURIComponent(readingReplacedText);
 
     // ダジャレ判定評価APIにアクセス
     const apiResponse = accessAllApi(encodedText, base_url);

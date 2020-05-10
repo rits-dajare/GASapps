@@ -24,3 +24,28 @@ function addGrade(userId, score) {
   return false;
 }
 
+function resetWeeklyGrade() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('grade');
+  
+  const lastRow = sheet.getLastRow()
+  const newData = sheet.getRange("B2:C" + sheet.getLastRow()).getValues();
+  for(var i = 0; i < newData.length; i++) {
+    newData[i][0] = newData[i][1] = 0;
+  }
+  sheet.getRange("B2:C" + lastRow).setValues(newData);
+  
+  return false;
+}
+
+function resetMonthlyGrade() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('grade');
+  
+  const lastRow = sheet.getLastRow()
+  const newData = sheet.getRange("D2:E" + sheet.getLastRow()).getValues();
+  for(var i = 0; i < newData.length; i++) {
+    newData[i][0] = newData[i][1] = 0;
+  }
+  sheet.getRange("D2:E" + lastRow).setValues(newData);
+  
+  return false;
+}
