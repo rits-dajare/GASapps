@@ -33,11 +33,13 @@ function postWeeklyRanking() {
   const message = templateString.replace("${joke}", rankingData[0][1])
                                 .replace("${name}", iD2Name(rankingData[0][0]))
                                 .replace("${stars}", star)
-                                .replace("${score}", Math.round(Number(rankingData[0][2]) * 10) / 10);
+                                .replace("${score}", Math.round(Number(rankingData[0][2]) * 100) / 100);
   
   sheet.getRange("A2:C2").setValues([['','','']]);
-  postTweet(message);
-  slackPost("#random", "今週のベストダジャレが公開されました！\n" + message);
+//  postTweet(message);
+  const date = new Date(); // Dateオブジェクト生成
+  const dateString = Utilities.formatDate(date,"JST","yyyy/MM/dd HH:mm:ss");
+  slackPost("#ranking_update_info", "今週のベストダジャレが公開されました！\n" + message + "\n" + date);
 }
 
 function postMonthlyRanking() {
@@ -55,7 +57,7 @@ function postMonthlyRanking() {
   const message = templateString.replace("${joke}", rankingData[0][1])
                                 .replace("${name}", iD2Name(rankingData[0][0]))
                                 .replace("${stars}", star)
-                                .replace("${score}", Math.round(Number(rankingData[0][2]) * 10) / 10);
+                                .replace("${score}", Math.round(Number(rankingData[0][2]) * 100) / 100);
   
   sheet.getRange("D2:F2").setValues([['','','']]);
   postTweet(message);

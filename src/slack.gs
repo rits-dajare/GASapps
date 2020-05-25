@@ -223,14 +223,14 @@ function dajare(jsonObj) {
 }
 
 function doPost(e){
-  try {
-    // 通常のダジャレ
-    var jsonObj = slackValidation(e);
-    if(jsonObj != false) {
-      dajare(jsonObj);
-    }
-  } catch(_) {
-    try{
+  try{
+    if('postData' in e && !('command' in e.parameter)) {
+      // 通常のダジャレ
+      var jsonObj = slackValidation(e);
+      if(jsonObj != false) {
+        dajare(jsonObj);
+      }
+    } else if('command' in e.parameter) {
       // スラッシュコマンド
       const command = e.parameter.command;
       if(command == "/force") {
@@ -252,9 +252,11 @@ function doPost(e){
       } else if (command == "/user") {
         return slashCommandUser(e);
       }
-    } catch(o_O) {
-      errLogging(o_O);
-      throw o_O;
+    } else {
+      errLogging("undefined command(custom error)");
     }
+  } catch (o_O) {
+    errLogging(o_O);
+    throw o_O;
   }
 }

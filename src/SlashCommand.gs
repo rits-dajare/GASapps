@@ -253,11 +253,14 @@ function slashCommandGrade(e, isTweet) {
   const templateString = "${name}さんのダジャレ成績\n週間ダジャレ数：${weekly}\n週間GPA：${wGPA}\n月間ダジャレ数：${monthly}\n月間GPA：${mGPA}\n半期間ダジャレ数：${halfPeriod}\n半期間GPA：${hGPA}";
   const message = templateString.replace("${name}", iD2Name(userId))
                                 .replace("${weekly}", gradeData[userRow][1])
-                                .replace("${wGPA}", Math.round(gradeData[userRow][2]/gradeData[userRow][1] * 10) / 10)
+                                .replace("${wGPA}", ((gradeData[userRow][1] > 0)
+                                                     ? Math.round(gradeData[userRow][2]/gradeData[userRow][1] * 10) / 10 : "-"))
                                 .replace("${monthly}", gradeData[userRow][3])
-                                .replace("${mGPA}", Math.round(gradeData[userRow][4]/gradeData[userRow][3] * 10) / 10)
+                                .replace("${mGPA}", ((gradeData[userRow][3] > 0)
+                                                     ? Math.round(gradeData[userRow][4]/gradeData[userRow][3] * 10) / 10 : "-"))
                                 .replace("${halfPeriod}", gradeData[userRow][5])
-                                .replace("${hGPA}", Math.round(gradeData[userRow][6]/gradeData[userRow][5] * 10) / 10);
+                                .replace("${hGPA}", ((gradeData[userRow][5] > 0)
+                                                     ? Math.round(gradeData[userRow][6]/gradeData[userRow][5] * 10) / 10 : "-"));
 
   // #ダジャレに投稿
   if(e.parameter.channel_id == "CTZKSMLCA") {
