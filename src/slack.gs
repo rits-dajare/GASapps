@@ -38,7 +38,7 @@ function readingReplace(str, mode) {
 function slackValidation(e) {
   const jsonObj = JSON.parse(e.postData.getDataAsString());
   // observerの投稿は弾く
-  if(jsonObj["event"]["user"] == "UUJQJ0YQG") {
+  if((!("event" in jsonObj)) || jsonObj["event"]["user"] === "UUJQJ0YQG" || typeof jsonObj["event"]["user"] === "undefined") {
     return false;
   }
 
