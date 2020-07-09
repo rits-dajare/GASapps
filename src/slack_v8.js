@@ -53,9 +53,9 @@
 //
 //function slackPost(channel, jsonObj, evaluateScore) {
 //  // Slackの特定のチャンネルに投稿
-//  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');  
+//  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
 //  const slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
-//  
+//
 //  // 投稿メッセージ生成
 //  const templateString = "【${time}】\nダジャレ：${joke}\n名前：${name}\n評価：${score}";
 //  const date = new Date(Number(jsonObj["event_time"])*1000); // Dateオブジェクト生成
@@ -92,7 +92,7 @@
 //}
 //
 //function iD2Name(id) {
-//  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');  
+//  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
 //  const slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
 //  const userinfo = slackApp.usersInfo(id);
 //
@@ -118,15 +118,15 @@
 //    errLogging(o_O);
 //    throw o_O;
 //  }
-//  
+//
 //  // ユーザーの表示名を追加
 //  jsonObj["event"]["name"] = iD2Name(jsonObj["event"]["user"]);
-//  
-//  
-//  
+//
+//
+//
 //  // スプレットシートに保存
 //  slack2SheetPost(jsonObj, score);
-//  
+//
 //  // イベントが二個出たとき，二個目は破棄して一行消す
 //  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('index');
 //  const lastRow = sheet.getLastRow();

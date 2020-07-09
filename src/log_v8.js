@@ -54,10 +54,10 @@
 //  },
 //  openCacheSht: function(name) {
 //    try{
-//      const ss = SpreadsheetApp.getActiveSpreadsheet(); 
-//      const sss = ss.getSheetByName("cacheSht"); 
+//      const ss = SpreadsheetApp.getActiveSpreadsheet();
+//      const sss = ss.getSheetByName("cacheSht");
 //      return sss;
-//    }catch(e){  
+//    }catch(e){
 //      Logger.log("シートを開けませんでした"+ e );
 //      return -1;
 //    }
@@ -65,7 +65,7 @@
 //}
 //
 //function postErrMsgToSlack(eMsg) {
-//  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');  
+//  const token = PropertiesService.getScriptProperties().getProperty('SLACK_ACCESS_TOKEN');
 //  const slackApp = SlackApp.create(token); //SlackApp インスタンスの取得
 //  const channel = "#bot_status"
 //  const options = {
