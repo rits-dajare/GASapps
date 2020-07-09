@@ -75,4 +75,3 @@
 //  };
 //  Logger.log(slackApp.postMessage(options.channelId, options.message, {username: options.userName}));
 //}
-
