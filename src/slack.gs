@@ -98,21 +98,21 @@ function addReaction(channel, ts, emoji){
 
 
 function accessJudgeApi(joke, base_url) {
-  const apiUrl = "/joke/judge/?joke=";
+  const apiUrl = "/dajare/judge/?dajare=";
   const response = UrlFetchApp.fetch(base_url + apiUrl + joke.replace(/%3A[^(%3A)]+%3A+/g, "")).getContentText();
   const resJson = JSON.parse(response);
   return resJson;
 }
 
 function accessEvaluateApi(joke, base_url) {
-  const apiUrl = "/joke/evaluate/?joke=";
+  const apiUrl = "/dajare/eval/?dajare=";
   const response = UrlFetchApp.fetch(base_url + apiUrl + joke.replace(/%3A[^(%3A)]+%3A+/g, "")).getContentText();
   const resJson = JSON.parse(response);
   return Number(resJson["score"]);
 }
 
 function accessKatakanaApi(joke, base_url) {
-  const apiUrl = "/joke/reading/?joke=";
+  const apiUrl = "/dajare/reading/?dajare=";
   const response = UrlFetchApp.fetch(base_url + apiUrl + joke.replace(/%3A[^(%3A)]+%3A+/g, "")).getContentText();
   const resJson = JSON.parse(response);
   return resJson["reading"];
@@ -120,9 +120,9 @@ function accessKatakanaApi(joke, base_url) {
 
 function accessAllApi(joke, base_url) {
   const nonEmojiJoke = joke.replace(/%3A[^(%3A)]+%3A+/g, "");
-  const judgeUrl = base_url + '/joke/judge/?joke=' + nonEmojiJoke;
-  const evaluateUrl = base_url + '/joke/evaluate/?joke=' + nonEmojiJoke;
-  const katakanaUrl = base_url + '/joke/reading/?joke=' + nonEmojiJoke;
+  const judgeUrl = base_url + '/dajare/judge/?dajare=' + nonEmojiJoke;
+  const evaluateUrl = base_url + '/dajare/eval/?dajare=' + nonEmojiJoke;
+  const katakanaUrl = base_url + '/dajare/reading/?dajare=' + nonEmojiJoke;
   
   const response = UrlFetchApp.fetchAll([judgeUrl, evaluateUrl, katakanaUrl]);
   const judgeJson = JSON.parse(response[0].getContentText());
@@ -153,10 +153,10 @@ function dajare(jsonObj) {
 
     // ダジャレ判定APIにアクセス
     const judgeJson = accessJudgeApi(encodedText, base_url);
-    const isjoke = judgeJson["is_joke"];
+    const isdajare = judgeJson["is_dajare"];
     const includeSensitive = judgeJson["include_sensitive"];
     sensitiveTags = judgeJson["sensitive_tags"];
-    if(!isjoke) {
+    if(!isdajare) {
       addReaction(jsonObj["event"]["channel"], jsonObj["event"]["ts"], "thumbsdown");
       return;
     }
@@ -174,7 +174,7 @@ function dajare(jsonObj) {
   // ユーザーの表示名を追加
   jsonObj["event"]["name"] = iD2Name(jsonObj["event"]["user"]);
 
-  // イベントが二個出たとき，二個目は破棄して一行消す
+  // 過去に実行されたイベントが再度出たとき，二個目は破棄する
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('index');
   const lastRow = sheet.getLastRow();
   const lastEventTime = sheet.getRange(lastRow, 1).getValue();
@@ -223,39 +223,54 @@ function dajare(jsonObj) {
 }
 
 function doPost(e){
+  const cache = makeCache();
+  if(!cache.get('used')) { // GASを使用中にする
+    cache.put('used', 1);
+  } else {
+    return 1;
+  }
   try{
     if('postData' in e && !('command' in e.parameter)) {
       // 通常のダジャレ
       var jsonObj = slackValidation(e);
-      if(jsonObj != false) {
+      if(jsonObj) {
         dajare(jsonObj);
       }
+      cache.put('used', 0); // GASを未使用中にする
+      return 1;
     } else if('command' in e.parameter) {
       // スラッシュコマンド
       const command = e.parameter.command;
+      var res = 0;
       if(command == "/force") {
-        return slashCommandForce(e);
+        res = slashCommandForce(e);
       } else if (command == "/katakana") {
-        return slashCommandKatakana(e);
+        res = slashCommandKatakana(e);
       } else if (command == "/katakana_hide") {
-        return slashCommandKatakana_hide(e);
+        res = slashCommandKatakana_hide(e);
       } else if (command == "/talk") {
-        return slashCommandTalk(e);
+        res = slashCommandTalk(e);
       } else if (command == "/list") {
-        return slashCommandList(e);
+        res = slashCommandList(e);
       } else if (command == "/info") {
-        return slashCommandInfo(e);
+        res = slashCommandInfo(e);
       } else if (command == "/grade") {
-        return slashCommandGrade(e);
+        res = slashCommandGrade(e);
       } else if (command == "/grade_with_tweet") {
-        return slashCommandGradeWithTweet(e);
+        res = slashCommandGradeWithTweet(e);
       } else if (command == "/user") {
-        return slashCommandUser(e);
+        res = slashCommandUser(e);
+      } else if (command == "/welcome") {
+        res = slashCommandWelcome(e);
       }
+      cache.put('used', 0); // GASを未使用中にする
+      return res;
     } else {
       errLogging("undefined command(custom error)");
+      cache.put('used', 0); // GASを未使用中にする
     }
   } catch (o_O) {
+    cache.put('used', 0); // GASを未使用中にする
     errLogging(o_O);
     throw o_O;
   }

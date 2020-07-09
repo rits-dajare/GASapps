@@ -36,9 +36,10 @@ function postWeeklyRanking() {
                                 .replace("${score}", Math.round(Number(rankingData[0][2]) * 100) / 100);
   
   sheet.getRange("A2:C2").setValues([['','','']]);
-  const tweetUrl = postTweet(message);
+  const tweetUrl = "https://twitter.com/rits_dajare/status/" + postTweet(message)["id_str"];
+  const dateString = Utilities.formatDate(new Date(),"JST","yyyy/MM/dd HH:mm:ss");
   slackPost("#ranking_update_info", "今週のベストダジャレが公開されました！\n${message}\n${date}\n${url}".replace("${message}", message)
-                                                                                                   .replace("${date}", new Date())
+                                                                                                   .replace("${date}", dateString)
                                                                                                    .replace("${url}", tweetUrl));
 }
 
@@ -53,13 +54,16 @@ function postMonthlyRanking() {
     } else {
       star += '☆';
     }
-  }logging(rankingData);
+  }
   const message = templateString.replace("${joke}", rankingData[0][1])
                                 .replace("${name}", iD2Name(rankingData[0][0]))
                                 .replace("${stars}", star)
                                 .replace("${score}", Math.round(Number(rankingData[0][2]) * 100) / 100);
   
   sheet.getRange("D2:F2").setValues([['','','']]);
-  postTweet(message);
-  slackPost("#random", "今月のベストダジャレが公開されました！\n" + message);
+  const tweetUrl = "https://twitter.com/rits_dajare/status/" + postTweet(message)["id_str"];
+  const dateString = Utilities.formatDate(new Date(),"JST","yyyy/MM/dd HH:mm:ss");
+  slackPost("#ranking_update_info", "今月のベストダジャレが公開されました！\n${message}\n${date}\n${url}".replace("${message}", message)
+                                                                                                   .replace("${date}", dateString)
+                                                                                                   .replace("${url}", tweetUrl));
 }

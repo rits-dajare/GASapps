@@ -98,10 +98,10 @@ function slashCommandKatakana(e) {
     throw o_O;
   }
   
-  const templateString = "コマンド：${command}\n原文：${original}\nダジャレ：${joke}\n読み：${reading}\n名前：${name}";
+  const templateString = "コマンド：${command}\n原文：${original}\nダジャレ：${dajare}\n読み：${reading}\n名前：${name}";
   const message = templateString.replace("${command}", e.parameter.command)
                                 .replace("${original}", text)
-                                .replace("${joke}", readingReplace(text, 1))
+                                .replace("${dajare}", readingReplace(text, 1))
                                 .replace("${reading}", reading)
                                 .replace("${name}", iD2Name(e.parameter.user_id));
 
@@ -140,10 +140,10 @@ function slashCommandKatakana_hide(e) {
     throw o_O;
   }
   
-  const templateString = "コマンド：${command}\n原文：${original}\nダジャレ：${joke}\n読み：${reading}";
+  const templateString = "コマンド：${command}\n原文：${original}\nダジャレ：${dajare}\n読み：${reading}";
   const message = templateString.replace("${command}", e.parameter.command)
                                 .replace("${original}", text)
-                                .replace("${joke}", readingReplace(text, 1))
+                                .replace("${dajare}", readingReplace(text, 1))
                                 .replace("${reading}", reading);
 
   const response = { text: "Katakana_hide : OK\n" + message};
@@ -200,7 +200,8 @@ function slashCommandInfo(e) {
 
     // ダジャレ判定評価APIにアクセス
     const apiResponse = accessAllApi(encodedText, base_url);
-    const isJoke = apiResponse[0]["is_joke"];
+    const isdajare = apiResponse[0]["is_dajare"];
+    //logging(isdajare);
     const includeSensitive = apiResponse[0]["include_sensitive"];
     const sensitiveTags = apiResponse[0]["sensitive_tags"];
     const score = apiResponse[1]["score"];
@@ -210,10 +211,10 @@ function slashCommandInfo(e) {
     throw o_O;
   }
   
-  const templateString = "ダジャレ：${joke}\n片仮名：${katakana}\nis_joke：${is_joke}\nevaluate：${evaluate}\ninclude_sensitive：${include_sensitive}\nsensitive_tags：${sensitive_tags}\n";
+  const templateString = "ダジャレ：${joke}\n片仮名：${katakana}\nis_dajare：${is_dajare}\nevaluate：${evaluate}\ninclude_sensitive：${include_sensitive}\nsensitive_tags：${sensitive_tags}\n";
   const message = templateString.replace("${joke}", readingReplace(text, 1))
                                 .replace("${katakana}", katakana)
-                                .replace("${is_joke}", isJoke)
+                                .replace("${is_dajare}", isdajare)
                                 .replace("${evaluate}", score)
                                 .replace("${include_sensitive}", includeSensitive)
                                 .replace("${sensitive_tags}",sensitiveTags.join(', '));
@@ -285,8 +286,12 @@ function slashCommandUser(e) {
 }
 
 
-
-
-
-
+function slashCommandWelcome(e) {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('message');
+  const userId = e.parameter.text;
+  const message = sheet.getRange("A1").getValue().replace("<@userID>さん、", userId ? "<@" + userId + ">さん、" : "");
+  const response = { text: message };
+  slackPost(e.parameter.channel_id, message);
+  return ContentService.createTextOutput();
+}
 

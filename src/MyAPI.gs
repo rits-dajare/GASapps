@@ -41,16 +41,22 @@ function doGet(e) {
 
   var json;
   try {
-    const jokeData = getJokes(true);
-    const randNum = ('randNum' in e.parameter) ? Number(e.parameter.randNum) : jokeData.length;
-    const extractedJokeData = extract(jokeData, randNum);
-    json = JSON.stringify({
-      "status": "OK",
-      "error": "",
-      "total": extractedJokeData.length,
-      "jokes": extractedJokeData,
-    });
-    logging('API Connected');
+    if('reset' in e.parameter) {
+      const cache = makeCache();
+      cache.put('used', e.parameter.reset > 0); // GASを未使用中にする
+      json = JSON.stringify();
+    } else {
+      const jokeData = getJokes(true);
+      const randNum = ('randNum' in e.parameter) ? Number(e.parameter.randNum) : jokeData.length;
+      const extractedJokeData = extract(jokeData, randNum);
+      json = JSON.stringify({
+        "status": "OK",
+        "error": "",
+        "total": extractedJokeData.length,
+        "jokes": extractedJokeData,
+      });
+      logging('API Connected');
+    }
   } catch(err) {
     errLogging(err);
     json = JSON.stringify({
@@ -77,8 +83,8 @@ URL = "https://script.google.com/macros/s/AKfycbx2h8jWePcUxszENqm4EqO7gk1bMDqGQK
 }
 */
 
-function test() {
-  var arr = [1,2,3,4,5];
-  arr=extract(arr,3);
-  logging(arr);
-}
+//function test() {
+//  var arr = [1,2,3,4,5];
+//  arr=extract(arr,3);
+//  logging(arr);
+//}
