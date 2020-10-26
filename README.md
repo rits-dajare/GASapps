@@ -28,5 +28,5 @@ Please read [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for details on our code
 ## Acknowledgments / 謝辞
 
 ### contributors
-* **[AjxLab](https://github.com/AjxLab)**
+* **[averak](https://github.com/averak)**
 * **[ygkn](https://github.com/ygkn)**
