@@ -1,0 +1,14 @@
+{
+  "name": "GASapps",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:rits-dajare/GASapps.git",
+  "author": "rits-dajare",
+  "license": "MIT",
+  "scripts": {
+    "publish": "clasp push -f"
+  },
+  "dependencies": {
+    "@google/clasp": "^2.3.0"
+  }
+}
