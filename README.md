@@ -1,4 +1,10 @@
-# Joke Management App
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Twitter](https://img.shields.io/badge/Twitter-%40rits_dajare-blue?logo=twitter)](https://twitter.com/rits_dajare)
+
+<div align="center">
+![](https://raw.githubusercontent.com/Ritsumeikan-Dajare-Circle/media/d72e2dbf8459689384af0de9e8b8d3e2d36a9cd2/logo/source.svg?sanitize=true)
+</div>
+
+# Dajare Management App
 
 An application that passes data between slack and twitter, and records on a spreadsheet.
 
@@ -12,7 +18,7 @@ An application that passes data between slack and twitter, and records on a spre
 ### Installing / インストール
 
 ```
-$ git clone https://github.com/rits-dajare/GASapps
+git clone https://github.com/rits-dajare/GASapps
 ```
 
 ## Contributing / コントリビューション
@@ -23,10 +29,11 @@ Please read [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for details on our code
 
 ## Authors / 著者
 
-* **[xryuseix](https://github.com/xryuseix)**
+- **[xryuseix](https://github.com/xryuseix)**
 
 ## Acknowledgments / 謝辞
 
 ### contributors
-* **[averak](https://github.com/averak)**
-* **[ygkn](https://github.com/ygkn)**
+
+- **[averak](https://github.com/averak)**
+- **[ygkn](https://github.com/ygkn)**
