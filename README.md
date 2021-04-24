@@ -7,7 +7,7 @@ An application that passes data between slack and twitter, and records on a spre
 1. Paste this code in the script of google spread sheet.
 2. Make a slack app.
 3. Apply for the API use of twitter.
-4. Please set up an API server referring to https://github.com/rits-dajare/dajare-engine.
+4. Please set up an API server referring to [DaaS](https://github.com/rits-dajare/DaaS).
 
 ### Installing / インストール
 
@@ -28,5 +28,5 @@ Please read [CONTRIBUTING.md](./.github/CONTRIBUTING.md) for details on our code
 ## Acknowledgments / 謝辞
 
 ### contributors
-* **[AjxLab](https://github.com/AjxLab)**
+* **[averak](https://github.com/averak)**
 * **[ygkn](https://github.com/ygkn)**
