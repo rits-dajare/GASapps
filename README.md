@@ -1,4 +1,6 @@
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Twitter](https://img.shields.io/badge/Twitter-%40rits_dajare-blue?logo=twitter)](https://twitter.com/rits_dajare)
+![deploy](https://github.com/rits-dajare/GASapps/workflows/deploy/badge.svg)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![Twitter](https://img.shields.io/badge/Twitter-%40rits_dajare-blue?logo=twitter)](https://twitter.com/rits_dajare)
 
 <div align="center">
   <img src="./images/logo.svg" width="80%" />
