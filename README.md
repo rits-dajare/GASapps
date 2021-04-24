@@ -1,7 +1,7 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE) [![Twitter](https://img.shields.io/badge/Twitter-%40rits_dajare-blue?logo=twitter)](https://twitter.com/rits_dajare)
 
 <div align="center">
-![](https://raw.githubusercontent.com/Ritsumeikan-Dajare-Circle/media/d72e2dbf8459689384af0de9e8b8d3e2d36a9cd2/logo/source.svg?sanitize=true)
+  <img src="./images/logo.svg" width="80%" />
 </div>
 
 # Dajare Management App
