@@ -230,8 +230,6 @@ function slashCommandInfo(e) {
     const apiResponse = accessAllApi(encodedText, base_url);
     const isdajare = apiResponse[0]["is_dajare"];
     //logging(isdajare);
-    const includeSensitive = apiResponse[0]["include_sensitive"];
-    const sensitiveTags = apiResponse[0]["sensitive_tags"];
     const score = apiResponse[1]["score"];
     const katakana = apiResponse[2]["reading"];
   } catch (o_O) {
@@ -240,14 +238,12 @@ function slashCommandInfo(e) {
   }
 
   const templateString =
-    "ダジャレ：${joke}\n片仮名：${katakana}\nis_dajare：${is_dajare}\nevaluate：${evaluate}\ninclude_sensitive：${include_sensitive}\nsensitive_tags：${sensitive_tags}\n";
+    "ダジャレ：${joke}\n片仮名：${katakana}\nis_dajare：${is_dajare}\nevaluate：${evaluate}\n";
   const message = templateString
     .replace("${joke}", readingReplace(text, 1))
     .replace("${katakana}", katakana)
     .replace("${is_dajare}", isdajare)
-    .replace("${evaluate}", score)
-    .replace("${include_sensitive}", includeSensitive)
-    .replace("${sensitive_tags}", sensitiveTags.join(", "));
+    .replace("${evaluate}", score);
 
   const response = { text: message };
   return ContentService.createTextOutput(JSON.stringify(response)).setMimeType(
