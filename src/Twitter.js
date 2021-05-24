@@ -5,6 +5,13 @@ var CONSUMER_SECRET = PropertiesService.getScriptProperties().getProperty(
   "TWITTER_API_SECRET_KEY"
 );
 
+/* ここからTwitter初回認証 */
+/* 認証が切れた時にやること
+  1. reset()を実行
+  2. authorize()を実行
+  3. 表示→ログに書かれたTwitterのURLへアクセスして，認証ボタンを押す
+  これでダメならトークンキーなどを再生成
+*/
 //認証用インスタンスの生成
 var twitter = TwitterWebService.getInstance(CONSUMER_KEY, CONSUMER_SECRET);
 
@@ -22,6 +29,7 @@ function authCallback(request) {
 function reset() {
   twitter.reset();
 }
+/* ここまでTwitter初回認証 */
 
 // ツイートを投稿
 function postTweet(tweetText) {
@@ -37,6 +45,7 @@ function postTweet(tweetText) {
     });
     return JSON.parse(response);
   } catch (e) {
+    errLogging(e);
     return -1;
   }
 }
@@ -81,6 +90,7 @@ function makeTweetText(jsonObj, evaluateScore) {
   return message;
 }
 
+// V8エンジンじゃないと欲しかったやつ
 if (!String.fromCodePoint)
   (function (stringFromCharCode) {
     var fromCodePoint = function (_) {
