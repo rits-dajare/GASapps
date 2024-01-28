@@ -1,4 +1,4 @@
-var JUDGE_API_BASE_URL = "https://daas.abelab.dev/";
+var JUDGE_API_BASE_URL = "https://daas.averak.net/";
 
 function slack2SheetPost(jsonObj, score, isSlash, includeSensitive, mode) {
   // スプレットシートに記述する
