@@ -284,6 +284,10 @@ function dajare(jsonObj) {
 }
 
 function doPost(e) {
+  const params = JSON.parse(e.postData.getDataAsString());
+  if (params.type === 'url_verification') {
+    return ContentService.createTextOutput(params.challenge);
+  }
   const cache = makeCache();
   if (!cache.get("used")) {
     // GASを使用中にする
