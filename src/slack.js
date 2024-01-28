@@ -1,4 +1,4 @@
-var JUDGE_API_BASE_URL = "https://api.abelab.dev/";
+var JUDGE_API_BASE_URL = "https://daas.abelab.dev/";
 
 function slack2SheetPost(jsonObj, score, isSlash, includeSensitive, mode) {
   // スプレットシートに記述する
@@ -116,7 +116,7 @@ function addReaction(channel, ts, emoji) {
 }
 
 function accessJudgeApi(joke, base_url) {
-  const apiUrl = "daas/judge?dajare=";
+  const apiUrl = "judge?dajare=";
   const response = UrlFetchApp.fetch(
     base_url + apiUrl + joke.replace(/%3A[^(%3A)]+%3A+/g, "")
   ).getContentText();
@@ -125,7 +125,7 @@ function accessJudgeApi(joke, base_url) {
 }
 
 function accessEvaluateApi(joke, base_url) {
-  const apiUrl = "daas/eval?dajare=";
+  const apiUrl = "eval?dajare=";
   const response = UrlFetchApp.fetch(
     base_url + apiUrl + joke.replace(/%3A[^(%3A)]+%3A+/g, "")
   ).getContentText();
@@ -134,7 +134,7 @@ function accessEvaluateApi(joke, base_url) {
 }
 
 function accessKatakanaApi(joke, base_url) {
-  const apiUrl = "daas/reading/?dajare=";
+  const apiUrl = "reading/?dajare=";
   const response = UrlFetchApp.fetch(
     base_url + apiUrl + joke.replace(/%3A[^(%3A)]+%3A+/g, "")
   ).getContentText();
@@ -144,9 +144,9 @@ function accessKatakanaApi(joke, base_url) {
 
 function accessAllApi(joke, base_url) {
   const nonEmojiJoke = joke.replace(/%3A[^(%3A)]+%3A+/g, "");
-  const judgeUrl = base_url + "daas/judge?dajare=" + nonEmojiJoke;
-  const evaluateUrl = base_url + "daas/eval?dajare=" + nonEmojiJoke;
-  const katakanaUrl = base_url + "daas/reading/?dajare=" + nonEmojiJoke;
+  const judgeUrl = base_url + "judge?dajare=" + nonEmojiJoke;
+  const evaluateUrl = base_url + "eval?dajare=" + nonEmojiJoke;
+  const katakanaUrl = base_url + "reading/?dajare=" + nonEmojiJoke;
 
   const response = UrlFetchApp.fetchAll([judgeUrl, evaluateUrl, katakanaUrl]);
   const judgeJson = JSON.parse(response[0].getContentText());
